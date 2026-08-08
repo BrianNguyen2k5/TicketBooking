@@ -1,11 +1,12 @@
 import dotenv from "dotenv";
-dotenv.config(); // Phải nạp .env lên đầu tiên trước khi import DB & Redis
+dotenv.config(); // nạp .env lên đầu tiên trước khi import DB & Redis
 
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import { prisma } from "./config/db";
 import "./config/redis";
+import authRoutes from "./routes/auth.route";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,7 +15,7 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-// Simple Health Check & Database Connection Test
+// Demo kiểm tra, đảm bảo code connect tốt.
 app.get("/health", async (req, res) => {
   try {
     const userCount = await prisma.users.count();
@@ -32,6 +33,8 @@ app.get("/health", async (req, res) => {
     res.status(500).json({ status: "DOWN", error: (error as Error).message });
   }
 });
+
+app.use("/api/auth", authRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
