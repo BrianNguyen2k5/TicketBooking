@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Bookings {
+  bookingid      String        @id @db.VarChar(20)
+  userid         String        @db.VarChar(20)
+  ticketid       String        @db.VarChar(20)
+  concertid      String        @db.VarChar(20)
+  voucherid      String?       @db.VarChar(20)
+  createdat      DateTime      @default(now()) @db.Timestamp(6)
+  expiredat      DateTime      @db.Timestamp(6)
+  amount         Int
+  totalprice     Decimal       @db.Decimal(12, 2)
+  discountprice  Decimal       @default(0) @db.Decimal(12, 2)
+  finalprice     Decimal       @db.Decimal(12, 2)
+  paymentmethod  String?       @db.VarChar(50)
+  transactionid  String?       @db.VarChar(255)
+  paidat         DateTime?     @db.Timestamp(6)
+  idempotencykey String        @unique @db.VarChar(255)
+  status         BookingStatus @default(PendingPayment)
+  Concerts       Concerts      @relation(fields: [concertid], references: [concertid], onDelete: NoAction, onUpdate: NoAction)
+  Tickets        Tickets       @relation(fields: [ticketid], references: [ticketid], onDelete: NoAction, onUpdate: NoAction)
+  Users          Users         @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction)
+  Voucher        Voucher?      @relation(fields: [voucherid], references: [voucherid], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Concerts {
+  concertid   String        @id @db.VarChar(20)
+  concertname String        @db.VarChar(255)
+  description String?
+  createdat   DateTime      @default(now()) @db.Timestamp(6)
+  starttime   DateTime?     @db.Timestamp(6)
+  startdate   DateTime?     @db.Timestamp(6)
+  status      ConcertStatus @default(CommingSoon)
+  Bookings    Bookings[]
+  Tickets     Tickets[]
+}
+
+model Tickets {
+  ticketid          String       @id @db.VarChar(20)
+  concertid         String       @db.VarChar(20)
+  ticketname        String       @db.VarChar(255)
+  priceperticket    Decimal      @db.Decimal(12, 2)
+  totalquantity     Int
+  availablequantity Int
+  createdat         DateTime     @default(now()) @db.Timestamp(6)
+  startdatetime     DateTime     @db.Timestamp(6)
+  enddatetime       DateTime     @db.Timestamp(6)
+  status            TicketStatus @default(Unavailable)
+  Bookings          Bookings[]
+  Concerts          Concerts     @relation(fields: [concertid], references: [concertid], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Users {
+  userid        String          @id @db.VarChar(20)
+  name          String          @db.VarChar(255)
+  email         String          @unique @db.VarChar(255)
+  phonenumber   String?         @db.VarChar(50)
+  password      String          @db.VarChar(255)
+  role          UserRole        @default(Customer)
+  Bookings      Bookings[]
+  VoucherUsages VoucherUsages[]
+}
+
+model Voucher {
+  voucherid       String          @id @db.VarChar(20)
+  vouchername     String          @unique @db.VarChar(255)
+  description     String?
+  discounttype    DiscountType
+  discountvalue   Decimal         @db.Decimal(12, 2)
+  maxusage        Int
+  maxusageperuser Int             @default(1)
+  startdate       DateTime        @db.Timestamp(6)
+  enddate         DateTime        @db.Timestamp(6)
+  usedcount       Int             @default(0)
+  status          VoucherStatus   @default(Available)
+  Bookings        Bookings[]
+  VoucherUsages   VoucherUsages[]
+}
+
+model VoucherUsages {
+  userid    String   @db.VarChar(20)
+  voucherid String   @db.VarChar(20)
+  appliedat DateTime @default(now()) @db.Timestamp(6)
+  Users     Users    @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction)
+  Voucher   Voucher  @relation(fields: [voucherid], references: [voucherid], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([userid, voucherid, appliedat])
+}
+
+enum BookingStatus {
+  PendingPayment
+  Confirmed
+  Cancelled
+  Expired
+}
+
+enum ConcertStatus {
+  CommingSoon
+  PreSale
+  OnSale
+  SoldOut
+  Cancelled
+  Ended
+}
+
+enum DiscountType {
+  Fixed
+  Percentage
+}
+
+enum TicketStatus {
+  Unavailable
+  Available
+  SoldOut
+  Cancelled
+}
+
+enum UserRole {
+  Customer
+  Operator
+  Admin
+}
+
+enum VoucherStatus {
+  Unavailable
+  Available
+  Ended
+  Cancelled
+}
