@@ -1,11 +1,11 @@
+import dotenv from "dotenv";
+dotenv.config(); // Phải nạp .env lên đầu tiên trước khi import DB & Redis
+
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import dotenv from "dotenv";
 import { prisma } from "./config/db";
 import "./config/redis";
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;

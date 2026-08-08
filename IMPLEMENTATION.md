@@ -9,7 +9,7 @@ Bài test yêu cầu thiết kế và hiện thực hệ thống backend cho ứ
 1. **Tài liệu Thiết kế Kiến trúc & Cơ sở dữ liệu (System & Database Design Document)**: Giải thích rõ tư duy thiết kế, ERD (khớp với `DATABASE.md`), Sequence Diagram, cùng phân tích trade-off các giải pháp chống oversell & race condition.
 2. **Codebase hoàn chỉnh (Backend REST APIs)**: Dựng bằng Node.js + Express (TypeScript), tuân thủ nghiêm ngặt **Mô hình 3 Lớp (Controller -> Service -> Repository)**.
 3. **Bộ Tài liệu Assumptions, Scope & Limitations**: Nêu rõ các giả định kinh doanh, những phần đã thực hiện và giới hạn phạm vi hệ thống.
-4. **Bộ Test & API Documentation**: Swagger UI / OpenAPI, Postman Collection kết nối trực tiếp PostgreSQL Local và Redis Cloud, kèm Unit/Integration Tests.
+4. **Bộ Test & API Documentation**: Swagger UI / OpenAPI (`http://localhost:3000/api-docs`), Postman Collection kết nối trực tiếp PostgreSQL Local và Redis Cloud, kèm Unit/Integration Tests.
 
 ---
 
@@ -64,33 +64,36 @@ src/
 ---
 
 ### Giai Đoạn 2: Khởi Tạo Dự Án & Dựng Infrastructure
-- [ ] **2.1. Khởi tạo Repository & Cấu hình Môi trường**:
-  - Setup Node.js Express + TypeScript, ESLint, Prettier, `.gitignore`.
+- [x] **2.1. Khởi tạo Repository & Cấu hình Môi trường**:
+  - Setup Node.js Express + TypeScript (`tsx watch`), ESLint, Prettier, `.gitignore`.
   - Cấu hình `.env` cho **PostgreSQL Local** và **Redis Cloud (30MB Free)**.
-- [ ] **2.2. Setup Database & Prisma ORM**:
-  - Định nghĩa file `prisma/schema.prisma` chuẩn hóa 100% tên bảng và trường dữ liệu theo `DATABASE.md`.
-  - Chạy `npx prisma migrate dev` khởi tạo database tables trên Postgres Local.
-  - Viết script `prisma/seed.ts` dữ liệu mẫu (Concerts, Tickets, Vouchers, Account Admin/Customer).
-- [ ] **2.3. Cấu hình Common Middlewares & Configs**:
-  - Redis Cloud Connection Client (`ioredis`).
-  - Global Error Handling Middleware, Auth Middleware (JWT), Swagger UI setup.
+- [x] **2.2. Setup Database & Prisma ORM**:
+  - Tạo 6 bảng & Seed data bằng SQL Script trên pgAdmin 4.
+  - Chạy `npx prisma db pull` & `npx prisma generate` sinh TypeScript Client tại `src/generated/prisma`.
+- [x] **2.3. Cấu hình Common Middlewares & Configs**:
+  - Postgres Connection Client (`src/config/db.ts` dùng Prisma 7 + Driver Adapter `@prisma/adapter-pg`).
+  - Redis Cloud Connection Client (`src/config/redis.ts` dùng `ioredis`).
+  - Server entry (`src/server.ts`) chạy mượt với `/health` endpoint.
 
 ---
 
 ### Giai Đoạn 3: Phát Triển Core APIs (Mô Hình 3 Lớp) - Customer Flow
-- [ ] **3.1. Concert & Ticket Browsing**:
+- [ ] **3.1. Auth & Common Utilities**:
+  - Zod DTO Validation Middleware.
+  - JWT Auth Middleware (`authenticate`, `authorizeRole`).
+- [ ] **3.2. Concert & Ticket Browsing**:
   - `ConcertController` -> `ConcertService` -> `ConcertRepository`
   - `GET /api/v1/concerts`: Danh sách sự kiện & các hạng vé khả dụng.
   - `GET /api/v1/concerts/:id`: Chi tiết sự kiện & số lượng vé `availablequantity`.
-- [ ] **3.2. Ticket Reservation (Tải cao & Concurrency trọng tâm)**:
+- [ ] **3.3. Ticket Reservation (Tải cao & Concurrency trọng tâm)**:
   - `BookingController` -> `BookingService` -> `BookingRepository` & `TicketRepository`
   - `POST /api/v1/bookings/reserve`:
     - Middleware kiểm tra `idempotencykey`.
     - `BookingService` gọi `TicketRepository` thực hiện Atomic Update giữ vé (`PendingPayment`) trong 10-15 phút.
-- [ ] **3.3. Voucher Application**:
+- [ ] **3.4. Voucher Application**:
   - `VoucherController` -> `VoucherService` -> `VoucherRepository`
   - `POST /api/v1/bookings/:id/apply-voucher`: Áp dụng voucher, kiểm tra `maxusage`, `maxusageperuser` và tính lại `finalprice`.
-- [ ] **3.4. Payment & Order Status**:
+- [ ] **3.5. Payment & Order Status**:
   - `POST /api/v1/bookings/:id/pay`: Mock callback thanh toán thành công -> chuyển trạng thái `Confirmed`, cập nhật `paidat`.
   - `GET /api/v1/bookings/:id`: Xem chi tiết trạng thái đơn hàng.
 
@@ -115,7 +118,8 @@ src/
   - Viết **Integration / Stress Test Script** (dùng Jest/k6) mô phỏng hàng loạt requests đặt vé đồng thời.
 - [ ] **5.2. Chuẩn bị Postman Collection**:
   - Export Postman Collection & Environment variables kết nối Postgres Local & Redis Cloud.
-- [ ] **5.3. Viết Tài Liệu Deliverables**:
+- [ ] **5.3. Tích Hợp Swagger UI & Viết Tài Liệu Deliverables**:
+  - **Tích hợp Swagger UI (`swagger-ui-express` + `swagger-jsdoc`)**: Tự động sinh giao diện tài liệu Swagger API tương tác tại `http://localhost:3000/api-docs`.
   - `README.md`: Hướng dẫn cấu hình `.env`, nạp DB local & khởi chạy.
   - `SYSTEM_DESIGN.md`: Sơ đồ Kiến trúc 3 lớp, ERD, Sequence Diagram, Phân tích kỹ thuật giải quyết Oversell & Idempotency.
   - `ASSUMPTIONS_AND_LIMITATIONS.md`: Giả định nghiệp vụ, phạm vi các tính năng đã làm / chưa làm.
@@ -130,4 +134,4 @@ src/
 
 ### Kiểm Thử Thủ Công
 - Sử dụng Postman Collection nhập `idempotencykey` trùng lặp để kiểm tra API trả về cùng một kết quả mà không tạo đơn trùng.
-- Kiểm tra Swagger UI tại `http://localhost:3000/api-docs`.
+- Kiểm tra Swagger UI tương tác tại `http://localhost:3000/api-docs`.
