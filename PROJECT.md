@@ -14,15 +14,6 @@
 
 Please upload all of result into 1 folder and submit via **Link (Email)**
 
-**More about us:**
-
-- GEEK UP business: https://geekup.vn
-- GEEK UP environment: https://www.facebook.com/GEEKUpAdventure
-- Phone: 028 6262 4400
-- Email: adventure@geekup.vn
-
----
-
 ## Event Ticket Booking
 
 ### RESPONSIBILITIES & REQUIREMENTS
