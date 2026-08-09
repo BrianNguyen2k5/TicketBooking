@@ -1,4 +1,5 @@
 import { adminRepository } from "../repositories/admin.repository";
+import { prisma } from "../config/db";
 import {
   BookingStatus,
   ConcertStatus,
@@ -32,8 +33,8 @@ export class AdminService {
       ticketname: string;
       priceperticket: number;
       totalquantity: number;
-      startdatetime: string;
-      enddatetime: string;
+      startdatetime?: string;
+      enddatetime?: string;
       status?: TicketStatus;
     }>;
   }) {
@@ -82,8 +83,10 @@ export class AdminService {
         throw new Error(`Total quantity for ticket '${t.ticketname}' must be greater than 0`);
       }
 
+      // Mặc định ngày bán vé kết thúc ngay trước thời điểm diễn ra Concert (startdateObj)
       const ticketStart = new Date(t.startdatetime || Date.now());
-      const ticketEnd = new Date(t.enddatetime || Date.now() + 30 * 24 * 60 * 60 * 1000);
+      const defaultTicketEnd = new Date(startdateObj.getTime() - 1000);
+      const ticketEnd = new Date(t.enddatetime || defaultTicketEnd);
 
       if (isNaN(ticketStart.getTime()) || isNaN(ticketEnd.getTime())) {
         throw new Error(`Invalid date format for ticket '${t.ticketname}' start/end datetime`);
@@ -91,6 +94,13 @@ export class AdminService {
 
       if (ticketStart >= ticketEnd) {
         throw new Error(`Ticket '${t.ticketname}' sale startdatetime must be strictly before enddatetime`);
+      }
+
+      // RÀNG BUỘC THEO YÊU CẦU: Ngày bắt đầu và kết thúc mở bán vé phải nhỏ hơn hoặc bằng startdate của Concert
+      if (ticketStart >= startdateObj || ticketEnd > startdateObj) {
+        throw new Error(
+          `Ticket '${t.ticketname}' sale dates (startdatetime & enddatetime) must be before or equal to concert startdate (${startdateObj.toISOString()})`
+        );
       }
 
       return {
@@ -151,6 +161,11 @@ export class AdminService {
       throw new Error("ticketname, priceperticket, and totalquantity are required to add a new ticket category");
     }
 
+    const concert = await prisma.concerts.findUnique({ where: { concertid } });
+    if (!concert) {
+      throw new Error("Concert not found");
+    }
+
     const price = Number(data.priceperticket);
     const totalQty = Number(data.totalquantity);
 
@@ -162,8 +177,9 @@ export class AdminService {
       throw new Error("totalquantity must be greater than 0");
     }
 
+    const defaultTicketEnd = new Date(concert.startdate.getTime() - 1000);
     const ticketStart = new Date(data.startdatetime || Date.now());
-    const ticketEnd = new Date(data.enddatetime || Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const ticketEnd = new Date(data.enddatetime || defaultTicketEnd);
 
     if (isNaN(ticketStart.getTime()) || isNaN(ticketEnd.getTime())) {
       throw new Error("Invalid date format for ticket startdatetime or enddatetime");
@@ -171,6 +187,13 @@ export class AdminService {
 
     if (ticketStart >= ticketEnd) {
       throw new Error("Ticket sale startdatetime must be strictly before enddatetime");
+    }
+
+    // RÀNG BUỘC THEO YÊU CẦU: Ngày bắt đầu và kết thúc bán vé phải nhỏ hơn hoặc bằng startdate của Concert
+    if (ticketStart >= concert.startdate || ticketEnd > concert.startdate) {
+      throw new Error(
+        `Ticket sale dates (startdatetime & enddatetime) must be before or equal to concert startdate (${concert.startdate.toISOString()})`
+      );
     }
 
     return await adminRepository.addTicketToConcert(concertid, {
