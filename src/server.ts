@@ -7,6 +7,8 @@ import helmet from "helmet";
 import { prisma } from "./config/db";
 import "./config/redis";
 import authRoutes from "./routes/auth.route";
+import browseRoutes from "./routes/browse.route";
+import bookingRoutes from "./routes/booking.route";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,7 +36,31 @@ app.get("/health", async (req, res) => {
   }
 });
 
-app.use("/api/auth", authRoutes);
+app.use("/api/v1/auth", authRoutes);
+// Customer
+// Browse concert (free)
+// View tickets category and prices (free, get the ticket list of a concert)
+app.use("/api/v1/browse", browseRoutes);
+
+// Reserve tickets (authorize)
+app.use("/api/v1/booking/reserved", bookingRoutes);
+
+// Apply voucher (authorize)
+
+// Track booking status (authorize)
+
+// Admin (full authorize):
+// Monitor bookings
+
+// Manage/Publish new concert tickets (SELECT/INSERT/UPDATE/DELETE)
+
+// Validate ticket availability
+
+// Manage voucher campaign
+
+// Handle failed/sus booking
+
+// Update booking status manually
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

@@ -69,6 +69,7 @@ CREATE TABLE "Bookings" (
     "totalprice" NUMERIC(12, 2) NOT NULL,
     "discountprice" NUMERIC(12, 2) NOT NULL DEFAULT 0,
     "finalprice" NUMERIC(12, 2) NOT NULL,
+		
     "paymentmethod" VARCHAR(50),
     "transactionid" VARCHAR(255),
     "paidat" TIMESTAMP,
