@@ -6,7 +6,6 @@ export class BookingRepository {
   async createBooking(data: {
     userid: string;
     ticketid: string;
-    concertid: string;
     amount: number;
     totalprice: number;
     finalprice: number;
@@ -18,7 +17,6 @@ export class BookingRepository {
         bookingid: await generateNextId("Bookings", "bookingid"),
         userid: data.userid,
         ticketid: data.ticketid,
-        concertid: data.concertid,
         amount: data.amount,
         totalprice: data.totalprice,
         finalprice: data.finalprice,
@@ -27,8 +25,11 @@ export class BookingRepository {
         status: BookingStatus.PendingPayment,
       },
       include: {
-        Tickets: true,
-        Concerts: true,
+        Tickets: {
+          include: {
+            Concerts: true,
+          },
+        },
       },
     });
   }
@@ -37,8 +38,11 @@ export class BookingRepository {
     return await prisma.bookings.findUnique({
       where: { bookingid: bookingId },
       include: {
-        Tickets: true,
-        Concerts: true,
+        Tickets: {
+          include: {
+            Concerts: true,
+          },
+        },
         Voucher: true,
       },
     });
@@ -54,8 +58,11 @@ export class BookingRepository {
         paidat: new Date(),
       },
       include: {
-        Tickets: true,
-        Concerts: true,
+        Tickets: {
+          include: {
+            Concerts: true,
+          },
+        },
         Voucher: true,
       },
     });
@@ -66,8 +73,11 @@ export class BookingRepository {
       where: { userid },
       orderBy: { createdat: "desc" },
       include: {
-        Tickets: true,
-        Concerts: true,
+        Tickets: {
+          include: {
+            Concerts: true,
+          },
+        },
         Voucher: true,
       },
     });

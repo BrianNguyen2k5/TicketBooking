@@ -1,3 +1,7 @@
+-- 0. Xóa các bảng và kiểu dữ liệu Enum cũ (nếu tồn tại)
+DROP TABLE IF EXISTS "VoucherUsages", "Bookings", "Voucher", "Tickets", "Concerts", "Users" CASCADE;
+DROP TYPE IF EXISTS "UserRole", "ConcertStatus", "TicketStatus", "DiscountType", "VoucherStatus", "BookingStatus" CASCADE;
+
 -- 1. Tạo các kiểu dữ liệu Enum
 CREATE TYPE "UserRole" AS ENUM ('Customer', 'Operator', 'Admin');
 CREATE TYPE "ConcertStatus" AS ENUM ('CommingSoon', 'PreSale', 'OnSale', 'SoldOut', 'Cancelled', 'Ended');
@@ -56,12 +60,11 @@ CREATE TABLE "Voucher" (
     "status" "VoucherStatus" NOT NULL DEFAULT 'Available'
 );
 
--- 6. Tạo bảng Bookings
+-- 6. Tạo bảng Bookings (Chuẩn 3NF - Quan hệ qua Tickets -> Concerts)
 CREATE TABLE "Bookings" (
     "bookingid" VARCHAR(20) PRIMARY KEY,
     "userid" VARCHAR(20) NOT NULL REFERENCES "Users"("userid"),
     "ticketid" VARCHAR(20) NOT NULL REFERENCES "Tickets"("ticketid"),
-    "concertid" VARCHAR(20) NOT NULL REFERENCES "Concerts"("concertid"),
     "voucherid" VARCHAR(20) REFERENCES "Voucher"("voucherid"),
     "createdat" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "expiredat" TIMESTAMP NOT NULL,
@@ -69,7 +72,6 @@ CREATE TABLE "Bookings" (
     "totalprice" NUMERIC(12, 2) NOT NULL,
     "discountprice" NUMERIC(12, 2) NOT NULL DEFAULT 0,
     "finalprice" NUMERIC(12, 2) NOT NULL,
-		
     "paymentmethod" VARCHAR(50),
     "transactionid" VARCHAR(255),
     "paidat" TIMESTAMP,
@@ -84,3 +86,16 @@ CREATE TABLE "VoucherUsages" (
     "appliedat" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("userid", "voucherid", "appliedat")
 );
+
+-- 8. Tạo các B-Tree Indexes Tối Ưu Hiệu Năng SQL Queries
+CREATE INDEX "idx_bookings_user_created" ON "Bookings" ("userid", "createdat" DESC);
+CREATE INDEX "idx_bookings_status_created" ON "Bookings" ("status", "createdat" DESC);
+CREATE INDEX "idx_bookings_ticketid" ON "Bookings" ("ticketid");
+CREATE INDEX "idx_bookings_status_expired" ON "Bookings" ("status", "expiredat");
+
+CREATE INDEX "idx_tickets_concert_status" ON "Tickets" ("concertid", "status");
+CREATE INDEX "idx_tickets_sale_dates" ON "Tickets" ("status", "startdatetime", "enddatetime");
+
+CREATE INDEX "idx_concerts_status_startdate" ON "Concerts" ("status", "startdate" ASC);
+
+CREATE INDEX "idx_vouchers_status_dates" ON "Voucher" ("status", "startdate", "enddate");

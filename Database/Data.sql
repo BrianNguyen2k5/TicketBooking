@@ -38,31 +38,31 @@ INSERT INTO "Voucher" ("voucherid", "vouchername", "description", "discounttype"
 ('vch-002', 'VIPDISCOUNT10', 'Giảm 10% cho hạng vé VIP', 'Percentage', 10.00, 50, 2, '2026-08-01 00:00:00', '2026-12-31 23:59:59', 1, 'Available'),
 ('vch-003', 'EXPIRED2025', 'Mã hết hạn đợt trước', 'Fixed', 100000.00, 20, 1, '2025-01-01 00:00:00', '2025-02-01 23:59:59', 20, 'Ended');
 
--- 5. Seed Bookings
+-- 5. Seed Bookings (Loại bỏ cột concertid dư thừa chuẩn 3NF)
 INSERT INTO "Bookings" 
-("bookingid", "userid", "ticketid", "concertid", "voucherid", "createdat", "expiredat", "amount", "totalprice", "discountprice", "finalprice", "paymentmethod", "transactionid", "paidat", "idempotencykey", "status") 
+("bookingid", "userid", "ticketid", "voucherid", "createdat", "expiredat", "amount", "totalprice", "discountprice", "finalprice", "paymentmethod", "transactionid", "paidat", "idempotencykey", "status") 
 VALUES
 -- Đơn đã hoàn tất thanh toán (Confirmed)
-('bkg-001', 'usr-004', 'tkt-001', 'conc-001', 'vch-001', 
+('bkg-001', 'usr-004', 'tkt-001', 'vch-001', 
  CURRENT_TIMESTAMP - INTERVAL '2 HOURS', CURRENT_TIMESTAMP - INTERVAL '1 HOUR 50 MINUTES', 
  2, 7000000.00, 200000.00, 6800000.00, 'VNPAY', 'txn-001', CURRENT_TIMESTAMP - INTERVAL '1 HOUR 55 MINUTES', 'idem-001', 'Confirmed'),
 
-('bkg-002', 'usr-005', 'tkt-002', 'conc-001', 'vch-002', 
+('bkg-002', 'usr-005', 'tkt-002', 'vch-002', 
  CURRENT_TIMESTAMP - INTERVAL '1 HOUR', CURRENT_TIMESTAMP - INTERVAL '50 MINUTES', 
  1, 2200000.00, 220000.00, 1980000.00, 'MOMO', 'txn-002', CURRENT_TIMESTAMP - INTERVAL '53 MINUTES', 'idem-002', 'Confirmed'),
 
 -- Đơn đang chờ thanh toán (PendingPayment - giữ chỗ 24h cho tiện test)
-('bkg-003', 'usr-006', 'tkt-003', 'conc-001', NULL, 
+('bkg-003', 'usr-006', 'tkt-003', NULL, 
  CURRENT_TIMESTAMP - INTERVAL '2 MINUTES', CURRENT_TIMESTAMP + INTERVAL '24 HOURS', 
  4, 4000000.00, 0.00, 4000000.00, NULL, NULL, NULL, 'idem-003', 'PendingPayment'),
 
 -- Đơn quá hạn thanh toán (Expired)
-('bkg-004', 'usr-007', 'tkt-003', 'conc-001', NULL, 
+('bkg-004', 'usr-007', 'tkt-003', NULL, 
  CURRENT_TIMESTAMP - INTERVAL '30 MINUTES', CURRENT_TIMESTAMP - INTERVAL '20 MINUTES', 
  2, 2000000.00, 0.00, 2000000.00, NULL, NULL, NULL, 'idem-004', 'Expired'),
 
 -- Đơn bị hủy (Cancelled)
-('bkg-005', 'usr-008', 'tkt-003', 'conc-001', NULL, 
+('bkg-005', 'usr-008', 'tkt-003', NULL, 
  CURRENT_TIMESTAMP - INTERVAL '3 HOURS', CURRENT_TIMESTAMP - INTERVAL '2 HOURS 50 MINUTES', 
  1, 1000000.00, 0.00, 1000000.00, NULL, NULL, NULL, 'idem-005', 'Cancelled');
 

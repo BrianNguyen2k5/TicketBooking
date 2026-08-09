@@ -11,7 +11,6 @@ model Bookings {
   bookingid      String        @id @db.VarChar(20)
   userid         String        @db.VarChar(20)
   ticketid       String        @db.VarChar(20)
-  concertid      String        @db.VarChar(20)
   voucherid      String?       @db.VarChar(20)
   createdat      DateTime      @default(now()) @db.Timestamp(6)
   expiredat      DateTime      @db.Timestamp(6)
@@ -24,10 +23,15 @@ model Bookings {
   paidat         DateTime?     @db.Timestamp(6)
   idempotencykey String        @unique @db.VarChar(255)
   status         BookingStatus @default(PendingPayment)
-  Concerts       Concerts      @relation(fields: [concertid], references: [concertid], onDelete: NoAction, onUpdate: NoAction)
   Tickets        Tickets       @relation(fields: [ticketid], references: [ticketid], onDelete: NoAction, onUpdate: NoAction)
   Users          Users         @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction)
   Voucher        Voucher?      @relation(fields: [voucherid], references: [voucherid], onDelete: NoAction, onUpdate: NoAction)
+
+  // Database Query Optimization Indexes
+  @@index([userid, createdat(sort: Desc)])
+  @@index([status, createdat(sort: Desc)])
+  @@index([ticketid])
+  @@index([status, expiredat])
 }
 
 model Concerts {
@@ -38,8 +42,10 @@ model Concerts {
   starttime   DateTime?     @db.Timestamp(6)
   startdate   DateTime?     @db.Timestamp(6)
   status      ConcertStatus @default(CommingSoon)
-  Bookings    Bookings[]
   Tickets     Tickets[]
+
+  // Database Query Optimization Indexes
+  @@index([status, startdate(sort: Asc)])
 }
 
 model Tickets {
@@ -55,6 +61,10 @@ model Tickets {
   status            TicketStatus @default(Unavailable)
   Bookings          Bookings[]
   Concerts          Concerts     @relation(fields: [concertid], references: [concertid], onDelete: Cascade, onUpdate: NoAction)
+
+  // Database Query Optimization Indexes
+  @@index([concertid, status])
+  @@index([status, startdatetime, enddatetime])
 }
 
 model Users {
@@ -82,6 +92,9 @@ model Voucher {
   status          VoucherStatus   @default(Available)
   Bookings        Bookings[]
   VoucherUsages   VoucherUsages[]
+
+  // Database Query Optimization Indexes
+  @@index([status, startdate, enddate])
 }
 
 model VoucherUsages {
