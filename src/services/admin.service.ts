@@ -162,10 +162,11 @@ export class AdminService {
     }
 
     const concert = await prisma.concerts.findUnique({ where: { concertid } });
-    if (!concert) {
-      throw new Error("Concert not found");
+    if (!concert || !concert.startdate) {
+      throw new Error("Concert not found or startdate is missing");
     }
 
+    const concertStartdate = concert.startdate;
     const price = Number(data.priceperticket);
     const totalQty = Number(data.totalquantity);
 
@@ -177,7 +178,7 @@ export class AdminService {
       throw new Error("totalquantity must be greater than 0");
     }
 
-    const defaultTicketEnd = new Date(concert.startdate.getTime() - 1000);
+    const defaultTicketEnd = new Date(concertStartdate.getTime() - 1000);
     const ticketStart = new Date(data.startdatetime || Date.now());
     const ticketEnd = new Date(data.enddatetime || defaultTicketEnd);
 
@@ -190,9 +191,9 @@ export class AdminService {
     }
 
     // RÀNG BUỘC THEO YÊU CẦU: Ngày bắt đầu và kết thúc bán vé phải nhỏ hơn hoặc bằng startdate của Concert
-    if (ticketStart >= concert.startdate || ticketEnd > concert.startdate) {
+    if (ticketStart >= concertStartdate || ticketEnd > concertStartdate) {
       throw new Error(
-        `Ticket sale dates (startdatetime & enddatetime) must be before or equal to concert startdate (${concert.startdate.toISOString()})`
+        `Ticket sale dates (startdatetime & enddatetime) must be before or equal to concert startdate (${concertStartdate.toISOString()})`
       );
     }
 
