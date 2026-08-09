@@ -103,19 +103,32 @@ export class AdminController {
   // GET /api/v1/admin/tickets/availability
   async getTicketAvailability(req: AuthenticatedRequest, res: Response) {
     try {
-      const availability = await adminService.getTicketAvailability();
+      const ticketid = req.query.ticketid as string;
+      const availability = await adminService.getTicketAvailability(ticketid);
       return sendSuccess(
         res,
         availability,
-        "Ticket availability retrieved",
+        ticketid
+          ? `Ticket ${ticketid} availability validated successfully`
+          : "Ticket availability overview retrieved",
         200
       );
+    } catch (error) {
+      return sendError(res, (error as Error).message, 400);
+    }
+  }
+
+  // --- VOUCHER CRUD ---
+
+  // GET /api/v1/admin/vouchers
+  async getAllVouchers(req: AuthenticatedRequest, res: Response) {
+    try {
+      const vouchers = await adminService.getAllVouchers();
+      return sendSuccess(res, vouchers, "Vouchers retrieved successfully", 200);
     } catch (error) {
       return sendError(res, (error as Error).message, 500);
     }
   }
-
-  // --- VOUCHER & BOOKING ---
 
   // POST /api/v1/admin/vouchers
   async createVoucher(req: AuthenticatedRequest, res: Response) {
@@ -126,6 +139,30 @@ export class AdminController {
       return sendError(res, (error as Error).message, 400);
     }
   }
+
+  // PUT /api/v1/admin/vouchers/:voucherId
+  async updateVoucher(req: AuthenticatedRequest, res: Response) {
+    try {
+      const voucherid = req.params.voucherId as string;
+      const result = await adminService.updateVoucher(voucherid, req.body);
+      return sendSuccess(res, result, "Voucher updated successfully", 200);
+    } catch (error) {
+      return sendError(res, (error as Error).message, 400);
+    }
+  }
+
+  // DELETE /api/v1/admin/vouchers/:voucherId
+  async deleteVoucher(req: AuthenticatedRequest, res: Response) {
+    try {
+      const voucherid = req.params.voucherId as string;
+      const result = await adminService.deleteVoucher(voucherid);
+      return sendSuccess(res, result, "Voucher cancelled successfully", 200);
+    } catch (error) {
+      return sendError(res, (error as Error).message, 400);
+    }
+  }
+
+  // --- BOOKING STATUS OVERRIDE ---
 
   // PATCH /api/v1/admin/bookings/:bookingId/status
   async updateBookingStatus(req: AuthenticatedRequest, res: Response) {

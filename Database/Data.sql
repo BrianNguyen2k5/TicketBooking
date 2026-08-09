@@ -1,16 +1,16 @@
 -- Làm sạch dữ liệu cũ
 TRUNCATE TABLE "VoucherUsages", "Bookings", "Voucher", "Tickets", "Concerts", "Users" CASCADE;
 
--- 1. Seed Users (Admin, Operator, Customer)
+-- 1. Seed Users (Mật khẩu tất cả tài khoản là password123)
 INSERT INTO "Users" ("userid", "name", "email", "phonenumber", "password", "role") VALUES
-('usr-001', 'Admin System', 'admin@geekup.vn', '0901000001', '$2a$12$eImiTXuWVxfM37uY4JANjOqgT4R9.n7fB2fG/jP4K8aX9.e1a2b3c', 'Admin'),
-('usr-002', 'Operator Anh Tu', 'anhtu.ops@geekup.vn', '0902000002', '$2a$12$eImiTXuWVxfM37uY4JANjOqgT4R9.n7fB2fG/jP4K8aX9.e1a2b3c', 'Operator'),
-('usr-003', 'Operator Minh Minh', 'minhminh.ops@geekup.vn', '0902000003', '$2a$12$eImiTXuWVxfM37uY4JANjOqgT4R9.n7fB2fG/jP4K8aX9.e1a2b3c', 'Operator'),
-('usr-004', 'Nguyen Van A', 'nguyenvana@gmail.com', '0913111222', '$2a$12$eImiTXuWVxfM37uY4JANjOqgT4R9.n7fB2fG/jP4K8aX9.e1a2b3c', 'Customer'),
-('usr-005', 'Tran Thi B', 'tranthib@gmail.com', '0913333444', '$2a$12$eImiTXuWVxfM37uY4JANjOqgT4R9.n7fB2fG/jP4K8aX9.e1a2b3c', 'Customer'),
-('usr-006', 'Le Van C', 'levanc@gmail.com', '0913555666', '$2a$12$eImiTXuWVxfM37uY4JANjOqgT4R9.n7fB2fG/jP4K8aX9.e1a2b3c', 'Customer'),
-('usr-007', 'Pham Minh D', 'phamminhd@gmail.com', '0913777888', '$2a$12$eImiTXuWVxfM37uY4JANjOqgT4R9.n7fB2fG/jP4K8aX9.e1a2b3c', 'Customer'),
-('usr-008', 'Hoang Anh E', 'hoanganhe@gmail.com', '0913999000', '$2a$12$eImiTXuWVxfM37uY4JANjOqgT4R9.n7fB2fG/jP4K8aX9.e1a2b3c', 'Customer');
+('usr-001', 'Admin System', 'admin@geekup.vn', '0901000001', 'password123', 'Admin'),
+('usr-002', 'Operator Anh Tu', 'anhtu.ops@geekup.vn', '0902000002', 'password123', 'Operator'),
+('usr-003', 'Operator Minh Minh', 'minhminh.ops@geekup.vn', '0902000003', 'password123', 'Operator'),
+('usr-004', 'Nguyen Van A', 'nguyenvana@gmail.com', '0913111222', 'password123', 'Customer'),
+('usr-005', 'Tran Thi B', 'tranthib@gmail.com', '0913333444', 'password123', 'Customer'),
+('usr-006', 'Le Van C', 'levanc@gmail.com', '0913555666', 'password123', 'Customer'),
+('usr-007', 'Pham Minh D', 'phamminhd@gmail.com', '0913777888', 'password123', 'Customer'),
+('usr-008', 'Hoang Anh E', 'hoanganhe@gmail.com', '0913999000', 'password123', 'Customer');
 
 -- 2. Seed Concerts
 INSERT INTO "Concerts" ("concertid", "concertname", "description", "starttime", "startdate", "status") VALUES
@@ -34,8 +34,8 @@ INSERT INTO "Tickets" ("ticketid", "concertid", "ticketname", "priceperticket", 
 
 -- 4. Seed Voucher
 INSERT INTO "Voucher" ("voucherid", "vouchername", "description", "discounttype", "discountvalue", "maxusage", "maxusageperuser", "startdate", "enddate", "usedcount", "status") VALUES
-('vch-001', 'FLASHSALE2026', 'Giảm 200k cho đơn đặt vé Flash Sale', 'Fixed', 200000.00, 100, 1, '2026-08-01 00:00:00', '2026-08-31 23:59:59', 3, 'Available'),
-('vch-002', 'VIPDISCOUNT10', 'Giảm 10% cho hạng vé VIP', 'Percentage', 10.00, 50, 2, '2026-08-01 00:00:00', '2026-09-30 23:59:59', 1, 'Available'),
+('vch-001', 'FLASH2026', 'Giảm 200k cho đơn đặt vé Flash Sale', 'Fixed', 200000.00, 100, 1, '2026-08-01 00:00:00', '2026-12-31 23:59:59', 2, 'Available'),
+('vch-002', 'VIPDISCOUNT10', 'Giảm 10% cho hạng vé VIP', 'Percentage', 10.00, 50, 2, '2026-08-01 00:00:00', '2026-12-31 23:59:59', 1, 'Available'),
 ('vch-003', 'EXPIRED2025', 'Mã hết hạn đợt trước', 'Fixed', 100000.00, 20, 1, '2025-01-01 00:00:00', '2025-02-01 23:59:59', 20, 'Ended');
 
 -- 5. Seed Bookings
@@ -51,10 +51,10 @@ VALUES
  CURRENT_TIMESTAMP - INTERVAL '1 HOUR', CURRENT_TIMESTAMP - INTERVAL '50 MINUTES', 
  1, 2200000.00, 220000.00, 1980000.00, 'MOMO', 'txn-002', CURRENT_TIMESTAMP - INTERVAL '53 MINUTES', 'idem-002', 'Confirmed'),
 
--- Đơn đang chờ thanh toán (PendingPayment - giữ chỗ 10 phút)
-('bkg-003', 'usr-006', 'tkt-003', 'conc-001', 'vch-001', 
- CURRENT_TIMESTAMP - INTERVAL '2 MINUTES', CURRENT_TIMESTAMP + INTERVAL '8 MINUTES', 
- 4, 4000000.00, 200000.00, 3800000.00, NULL, NULL, NULL, 'idem-003', 'PendingPayment'),
+-- Đơn đang chờ thanh toán (PendingPayment - giữ chỗ 24h cho tiện test)
+('bkg-003', 'usr-006', 'tkt-003', 'conc-001', NULL, 
+ CURRENT_TIMESTAMP - INTERVAL '2 MINUTES', CURRENT_TIMESTAMP + INTERVAL '24 HOURS', 
+ 4, 4000000.00, 0.00, 4000000.00, NULL, NULL, NULL, 'idem-003', 'PendingPayment'),
 
 -- Đơn quá hạn thanh toán (Expired)
 ('bkg-004', 'usr-007', 'tkt-003', 'conc-001', NULL, 
@@ -62,12 +62,11 @@ VALUES
  2, 2000000.00, 0.00, 2000000.00, NULL, NULL, NULL, 'idem-004', 'Expired'),
 
 -- Đơn bị hủy (Cancelled)
-('bkg-005', 'usr-008', 'tkt-003', 'conc-001', 'vch-001', 
+('bkg-005', 'usr-008', 'tkt-003', 'conc-001', NULL, 
  CURRENT_TIMESTAMP - INTERVAL '3 HOURS', CURRENT_TIMESTAMP - INTERVAL '2 HOURS 50 MINUTES', 
- 1, 1000000.00, 200000.00, 800000.00, NULL, NULL, NULL, 'idem-005', 'Cancelled');
+ 1, 1000000.00, 0.00, 1000000.00, NULL, NULL, NULL, 'idem-005', 'Cancelled');
 
 -- 6. Seed VoucherUsages
 INSERT INTO "VoucherUsages" ("userid", "voucherid", "appliedat") VALUES
 ('usr-004', 'vch-001', CURRENT_TIMESTAMP - INTERVAL '2 HOURS'),
-('usr-005', 'vch-002', CURRENT_TIMESTAMP - INTERVAL '1 HOUR'),
-('usr-006', 'vch-001', CURRENT_TIMESTAMP - INTERVAL '2 MINUTES');
+('usr-005', 'vch-002', CURRENT_TIMESTAMP - INTERVAL '1 HOUR');

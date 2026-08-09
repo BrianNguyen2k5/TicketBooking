@@ -52,10 +52,25 @@ router.get("/tickets/availability", (req, res) =>
   adminController.getTicketAvailability(req, res)
 );
 
-// --- VOUCHER & BOOKING OVERRIDE ROUTES ---
+// --- VOUCHER CRUD ROUTES ---
+
+// List all vouchers (GET /api/v1/admin/vouchers)
+router.get("/vouchers", (req, res) => adminController.getAllVouchers(req, res));
 
 // Create new voucher campaign (POST /api/v1/admin/vouchers)
 router.post("/vouchers", (req, res) => adminController.createVoucher(req, res));
+
+// Update voucher campaign (PUT /api/v1/admin/vouchers/:voucherId)
+router.put("/vouchers/:voucherId", (req, res) =>
+  adminController.updateVoucher(req, res)
+);
+
+// Cancel/Delete voucher campaign (DELETE /api/v1/admin/vouchers/:voucherId)
+router.delete("/vouchers/:voucherId", (req, res) =>
+  adminController.deleteVoucher(req, res)
+);
+
+// --- BOOKING OVERRIDE ROUTE ---
 
 // Manual override booking status (PATCH /api/v1/admin/bookings/:bookingId/status)
 router.patch("/bookings/:bookingId/status", (req, res) =>

@@ -71,7 +71,7 @@ export class AdminService {
 
   async updateConcert(concertid: string, data: any) {
     if (!data || Object.keys(data).length === 0) {
-      throw new Error("At least one field (concertname, description, starttime, startdate, status) must be provided to update concert");
+      throw new Error("At least one field must be provided to update concert");
     }
 
     const updateData: any = {};
@@ -107,7 +107,7 @@ export class AdminService {
 
   async updateTicket(ticketid: string, data: any) {
     if (!data || Object.keys(data).length === 0) {
-      throw new Error("At least one field (ticketname, priceperticket, totalquantity, availablequantity, status) must be provided to update ticket");
+      throw new Error("At least one field must be provided to update ticket");
     }
 
     const updateData: any = {};
@@ -124,11 +124,15 @@ export class AdminService {
     return await adminRepository.deleteTicket(ticketid);
   }
 
-  async getTicketAvailability() {
-    return await adminRepository.getTicketAvailability();
+  async getTicketAvailability(ticketid?: string) {
+    const result = await adminRepository.getTicketAvailability(ticketid);
+    if (ticketid && !result) {
+      throw new Error("Ticket not found");
+    }
+    return result;
   }
 
-  // --- VOUCHER & BOOKING ---
+  // --- VOUCHER CRUD ---
 
   async createVoucher(data: {
     vouchername: string;
@@ -152,11 +156,40 @@ export class AdminService {
       discountvalue: Number(data.discountvalue),
       maxusage: Number(data.maxusage),
       maxusageperuser: data.maxusageperuser ? Number(data.maxusageperuser) : 1,
-      startdate: new Date(data.startdate),
-      enddate: new Date(data.enddate),
+      startdate: new Date(data.startdate || Date.now()),
+      enddate: new Date(data.enddate || Date.now() + 30 * 24 * 60 * 60 * 1000),
       status: data.status,
     });
   }
+
+  async getAllVouchers() {
+    return await adminRepository.findAllVouchers();
+  }
+
+  async updateVoucher(voucherid: string, data: any) {
+    if (!data || Object.keys(data).length === 0) {
+      throw new Error("At least one field must be provided to update voucher");
+    }
+
+    const updateData: any = {};
+    if (data.vouchername) updateData.vouchername = data.vouchername;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.discounttype) updateData.discounttype = data.discounttype;
+    if (data.discountvalue != null) updateData.discountvalue = Number(data.discountvalue);
+    if (data.maxusage != null) updateData.maxusage = Number(data.maxusage);
+    if (data.maxusageperuser != null) updateData.maxusageperuser = Number(data.maxusageperuser);
+    if (data.startdate) updateData.startdate = new Date(data.startdate);
+    if (data.enddate) updateData.enddate = new Date(data.enddate);
+    if (data.status) updateData.status = data.status;
+
+    return await adminRepository.updateVoucher(voucherid, updateData);
+  }
+
+  async deleteVoucher(voucherid: string) {
+    return await adminRepository.deleteVoucher(voucherid);
+  }
+
+  // --- BOOKING STATUS OVERRIDE ---
 
   async updateBookingStatus(bookingid: string, status: BookingStatus) {
     if (!status) {

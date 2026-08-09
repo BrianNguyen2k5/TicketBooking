@@ -69,7 +69,7 @@ Tài liệu Hướng dẫn Kiểm thử Toàn diện (Test Plan) cho tất cả 
   }
   ```
 - **Kết quả kỳ vọng**: `201 Created`
-  - Đơn hàng được tạo thành công với mã `bookingid` (ví dụ: `bk-001`).
+  - Đơn hàng được tạo thành công với mã `bookingid` (ví dụ: `bkg-006`).
   - Trạng thái đơn `status`: `"PendingPayment"`.
   - `expiredat`: Hết hạn sau 10 phút.
   - **Hành động**: Lưu lại `bookingid` vừa sinh ra!
@@ -84,12 +84,12 @@ Tài liệu Hướng dẫn Kiểm thử Toàn diện (Test Plan) cho tất cả 
 - **Body (JSON)**: *(Giữ nguyên)*
 - **Kết quả kỳ vọng**: `201 Created`
   - Trả về **KẾT QUẢ ĐÃ XỬ LÝ TRƯỚC ĐÓ** từ Cache Redis Cloud ngay lập tức!
-  - **Kiểm tra**: Số lượng vé trong Database **KHÔNG bị trừ lần 2**, không có đơn `bk-002` nào bị tạo trùng!
+  - **Kiểm tra**: Số lượng vé trong Database **KHÔNG bị trừ lần 2**, không có đơn `bkg-007` nào bị tạo trùng!
 
 ---
 
 ### 1.6. Áp Dụng Mã Giảm Giá (Apply Voucher)
-- **Method & URL**: `POST http://localhost:3000/api/v1/bookings/bk-001/apply-voucher`
+- **Method & URL**: `POST http://localhost:3000/api/v1/bookings/bkg-006/apply-voucher`
 - **Headers**:
   - `Authorization`: `Bearer <CUSTOMER_TOKEN>`
 - **Body (JSON)**:
@@ -99,13 +99,13 @@ Tài liệu Hướng dẫn Kiểm thử Toàn diện (Test Plan) cho tất cả 
   }
   ```
 - **Kết quả kỳ vọng**: `200 OK`
-  - Đơn hàng `bk-001` được cập nhật `discountprice` và `finalprice` bị giảm đi chính xác.
+  - Đơn hàng `bkg-006` được cập nhật `discountprice` và `finalprice` bị giảm đi chính xác.
   - Lượt sử dụng `usedcount` của voucher trong DB được tăng thêm 1.
 
 ---
 
 ### 1.7. Thanh Toán Giả Lập (Mock Payment Callback)
-- **Method & URL**: `POST http://localhost:3000/api/v1/bookings/bk-001/pay`
+- **Method & URL**: `POST http://localhost:3000/api/v1/bookings/bkg-006/pay`
 - **Headers**:
   - `Authorization`: `Bearer <CUSTOMER_TOKEN>`
 - **Body (JSON)**:
@@ -131,11 +131,11 @@ Tài liệu Hướng dẫn Kiểm thử Toàn diện (Test Plan) cho tất cả 
 ---
 
 ### 1.9. Xem Chi Tiết 1 Đơn Hàng (Track Booking Status)
-- **Method & URL**: `GET http://localhost:3000/api/v1/bookings/bk-001`
+- **Method & URL**: `GET http://localhost:3000/api/v1/bookings/bkg-006`
 - **Headers**:
   - `Authorization`: `Bearer <CUSTOMER_TOKEN>`
 - **Kết quả kỳ vọng**: `200 OK`
-  - Trả về đầy đủ thông tin đơn hàng `bk-001` kèm thông tin Vé, Concert và Voucher.
+  - Trả về đầy đủ thông tin đơn hàng `bkg-006` kèm thông tin Vé, Concert và Voucher.
 
 ---
 
@@ -159,7 +159,7 @@ Tài liệu Hướng dẫn Kiểm thử Toàn diện (Test Plan) cho tất cả 
 - **Method & URL**: `GET http://localhost:3000/api/v1/admin/bookings?status=Confirmed`
 - **Headers**: `Authorization: Bearer <ADMIN_TOKEN>`
 - **Kết quả kỳ vọng**: `200 OK`
-  - Trả về danh sách đơn hàng toàn hệ thống có lọc theo điều kiện `status=Confirmed`.
+  - Trả về danh sách đơn hàng toàn hệ thống có lọc theo điều kiện `status=Confirmed` (Bỏ query param `?status=...` để xem tất cả).
 
 ---
 
@@ -171,11 +171,18 @@ Tài liệu Hướng dẫn Kiểm thử Toàn diện (Test Plan) cho tất cả 
 
 ---
 
-### 2.4. Kiểm Tra Tình Trạng Kho Vé Real-time (Check Ticket Availability)
-- **Method & URL**: `GET http://localhost:3000/api/v1/admin/tickets/availability`
-- **Headers**: `Authorization: Bearer <ADMIN_TOKEN>`
-- **Kết quả kỳ vọng**: `200 OK`
-  - Trả về bảng tổng quan từng Concert kèm số vé tổng `totalquantity` và số vé còn lại `availablequantity`.
+### 2.4. Kiểm Tra Tình Trạng Kho Vé Real-time (Validate Ticket Availability)
+API hỗ trợ 2 cách kiểm tra:
+
+1. **Xem tổng quan kho vé tất cả Concerts**:
+   - **Method & URL**: `GET http://localhost:3000/api/v1/admin/tickets/availability`
+   - **Headers**: `Authorization: Bearer <ADMIN_TOKEN>`
+   - **Kết quả kỳ vọng**: `200 OK` (Trả về bảng tổng quan tất cả Concerts & Vé).
+
+2. **Kiểm tra tính khả dụng của 1 vé cụ thể**:
+   - **Method & URL**: `GET http://localhost:3000/api/v1/admin/tickets/availability?ticketid=tkt-001`
+   - **Headers**: `Authorization: Bearer <ADMIN_TOKEN>`
+   - **Kết quả kỳ vọng**: `200 OK`
 
 ---
 
@@ -204,7 +211,7 @@ Tài liệu Hướng dẫn Kiểm thử Toàn diện (Test Plan) cho tất cả 
   }
   ```
 - **Kết quả kỳ vọng**: `201 Created`
-  - Nhận mã Concert mới sinh dạng `cnc-004` (hoặc `cnc-001` nếu DB trống).
+  - Nhận mã Concert mới sinh dạng `conc-004` (hoặc `conc-001` nếu DB trống).
 
 ---
 
@@ -259,7 +266,14 @@ Tài liệu Hướng dẫn Kiểm thử Toàn diện (Test Plan) cho tất cả 
 
 ---
 
-### 2.10. Tạo Chiến Dịch Mã Giảm Giá Mới (CREATE Voucher)
+### 2.10. Quản Lý Chiến Dịch Mã Giảm Giá (VOUCHER FULL CRUD)
+
+#### 🟢 Kịch bản 2.10a: Xem danh sách các chiến dịch Voucher (READ Vouchers)
+- **Method & URL**: `GET http://localhost:3000/api/v1/admin/vouchers`
+- **Headers**: `Authorization: Bearer <ADMIN_TOKEN>`
+- **Kết quả kỳ vọng**: `200 OK` (Trả về mảng danh sách toàn bộ Vouchers).
+
+#### 🟢 Kịch bản 2.10b: Tạo mã giảm giá mới (CREATE Voucher)
 - **Method & URL**: `POST http://localhost:3000/api/v1/admin/vouchers`
 - **Headers**: `Authorization: Bearer <ADMIN_TOKEN>`
 - **Body (JSON)**:
@@ -277,10 +291,28 @@ Tài liệu Hướng dẫn Kiểm thử Toàn diện (Test Plan) cho tất cả 
   ```
 - **Kết quả kỳ vọng**: `201 Created`
 
+#### 🟢 Kịch bản 2.10c: Cập nhật thông tin Voucher (UPDATE Voucher)
+- **Method & URL**: `PUT http://localhost:3000/api/v1/admin/vouchers/vch-001`
+- **Headers**: `Authorization: Bearer <ADMIN_TOKEN>`
+- **Body (JSON)**:
+  ```json
+  {
+    "discountvalue": 300000,
+    "maxusage": 1000
+  }
+  ```
+- **Kết quả kỳ vọng**: `200 OK`
+
+#### 🔴 Kịch bản 2.10d: Hủy chiến dịch Voucher (DELETE Voucher)
+- **Method & URL**: `DELETE http://localhost:3000/api/v1/admin/vouchers/vch-001`
+- **Headers**: `Authorization: Bearer <ADMIN_TOKEN>`
+- **Kết quả kỳ vọng**: `200 OK` (Voucher `vch-001` chuyển trạng thái `Cancelled`).
+
 ---
 
-### 2.11. Can Thiệp Thủ Công Trạng Thái Đơn Hàng (Manual Override & Auto Release Ticket)
-- **Method & URL**: `PATCH http://localhost:3000/api/v1/admin/bookings/bk-001/status`
+### 2.11. Can Thiệp Thủ Công Trạng Thái Đơn Hàng & Xử Lý Đơn Lỗi/Gian Lận (Manual Override & Handle Failed/Suspicious Bookings)
+
+- **Method & URL**: `PATCH http://localhost:3000/api/v1/admin/bookings/bkg-003/status`
 - **Headers**: `Authorization: Bearer <ADMIN_TOKEN>`
 - **Body (JSON)**:
   ```json
@@ -288,9 +320,7 @@ Tài liệu Hướng dẫn Kiểm thử Toàn diện (Test Plan) cho tất cả 
     "status": "Cancelled"
   }
   ```
-- **Kết quả kỳ vọng**: `200 OK`
-  - Đơn hàng `bk-001` bị đổi trạng thái thành `Cancelled`.
-  - **Đặc biệt**: Số lượng vé trong kho `availablequantity` tự động được hoàn trả ngược lại vào Database!
+- **Kết quả kỳ vọng**: `200 OK` (Tự động cộng trả vé vào kho).
 
 ---
 
@@ -305,7 +335,7 @@ Tài liệu Hướng dẫn Kiểm thử Toàn diện (Test Plan) cho tất cả 
    - **Kỳ vọng**: Trả về `401 Unauthorized: No token provided`.
 
 3. **Test Áp mã Voucher không tồn tại**:
-   - Thử gửi `POST /api/v1/bookings/bk-001/apply-voucher` với mã `"MALICIOUS_CODE"`.
+   - Thử gửi `POST /api/v1/bookings/bkg-006/apply-voucher` với mã `"MALICIOUS_CODE"`.
    - **Kỳ vọng**: Trả về `400 Bad Request: Voucher code does not exist`.
 
 ---

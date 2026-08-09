@@ -1,5 +1,5 @@
 import { prisma } from "../config/db";
-import { generateNextId } from "../utils/idGenerator";
+import { generateNextId, generateNextIds } from "../utils/idGenerator";
 import {
   BookingStatus,
   ConcertStatus,
@@ -61,7 +61,6 @@ export class AdminRepository {
 
   // --- CONCERT CRUD ---
 
-  // CREATE Concert with Tickets
   async createConcertWithTickets(data: {
     concertname: string;
     description?: string;
@@ -78,6 +77,7 @@ export class AdminRepository {
     }>;
   }) {
     const concertid = await generateNextId("Concerts", "concertid");
+    const ticketIds = await generateNextIds("Tickets", "ticketid", data.tickets.length);
 
     return await prisma.$transaction(async (tx) => {
       await tx.concerts.create({
@@ -91,8 +91,9 @@ export class AdminRepository {
         },
       });
 
-      for (const t of data.tickets) {
-        const ticketid = await generateNextId("Tickets", "ticketid");
+      for (let i = 0; i < data.tickets.length; i++) {
+        const t = data.tickets[i];
+        const ticketid = ticketIds[i];
         await tx.tickets.create({
           data: {
             ticketid,
@@ -115,7 +116,6 @@ export class AdminRepository {
     });
   }
 
-  // UPDATE Concert
   async updateConcert(
     concertid: string,
     data: Partial<{
@@ -133,7 +133,6 @@ export class AdminRepository {
     });
   }
 
-  // DELETE / CANCEL Concert
   async deleteConcert(concertid: string) {
     return await prisma.concerts.update({
       where: { concertid },
@@ -143,7 +142,6 @@ export class AdminRepository {
 
   // --- TICKET CRUD ---
 
-  // CREATE Ticket Category for an existing Concert
   async addTicketToConcert(
     concertid: string,
     data: {
@@ -171,7 +169,6 @@ export class AdminRepository {
     });
   }
 
-  // UPDATE Ticket Category
   async updateTicket(
     ticketid: string,
     data: Partial<{
@@ -188,7 +185,6 @@ export class AdminRepository {
     });
   }
 
-  // DELETE / CANCEL Ticket Category
   async deleteTicket(ticketid: string) {
     return await prisma.tickets.update({
       where: { ticketid },
@@ -196,8 +192,26 @@ export class AdminRepository {
     });
   }
 
-  // Validate Real-time Ticket Availability
-  async getTicketAvailability() {
+  async getTicketAvailability(ticketid?: string) {
+    if (ticketid) {
+      const ticket = await prisma.tickets.findUnique({
+        where: { ticketid },
+        include: { Concerts: true },
+      });
+
+      if (!ticket) return null;
+
+      return {
+        ticketid: ticket.ticketid,
+        ticketname: ticket.ticketname,
+        concertname: ticket.Concerts.concertname,
+        isAvailable: ticket.status === TicketStatus.Available && ticket.availablequantity > 0,
+        availablequantity: ticket.availablequantity,
+        totalquantity: ticket.totalquantity,
+        status: ticket.status,
+      };
+    }
+
     return await prisma.concerts.findMany({
       select: {
         concertid: true,
@@ -217,9 +231,9 @@ export class AdminRepository {
     });
   }
 
-  // --- VOUCHER ---
+  // --- VOUCHER CRUD ---
 
-  // Create Voucher
+  // CREATE Voucher
   async createVoucher(data: {
     vouchername: string;
     description?: string;
@@ -249,7 +263,44 @@ export class AdminRepository {
     });
   }
 
-  // Manual Override Booking Status
+  // READ All Vouchers
+  async findAllVouchers() {
+    return await prisma.voucher.findMany({
+      orderBy: { startdate: "desc" },
+    });
+  }
+
+  // UPDATE Voucher
+  async updateVoucher(
+    voucherid: string,
+    data: Partial<{
+      vouchername: string;
+      description: string;
+      discounttype: DiscountType;
+      discountvalue: number;
+      maxusage: number;
+      maxusageperuser: number;
+      startdate: Date;
+      enddate: Date;
+      status: VoucherStatus;
+    }>
+  ) {
+    return await prisma.voucher.update({
+      where: { voucherid },
+      data,
+    });
+  }
+
+  // DELETE / CANCEL Voucher
+  async deleteVoucher(voucherid: string) {
+    return await prisma.voucher.update({
+      where: { voucherid },
+      data: { status: VoucherStatus.Cancelled },
+    });
+  }
+
+  // --- BOOKING STATUS OVERRIDE ---
+
   async updateBookingStatusWithInventory(
     bookingid: string,
     newStatus: BookingStatus

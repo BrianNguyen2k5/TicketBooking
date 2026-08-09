@@ -30,5 +30,8 @@ Here is how your list maps into clean, RESTful API endpoints:
 | **Update ticket category**                    | `PATCH /api/v1/admin/tickets/:ticketId`     | ✅ Admin/Op  | UPDATE price, total quantity, available quantity|
 | **Delete / Cancel ticket category**           | `DELETE /api/v1/admin/tickets/:ticketId`    | ✅ Admin/Op  | DELETE/Cancel ticket category                   |
 | **Validate ticket availability**              | `GET /api/v1/admin/tickets/availability`    | ✅ Admin/Op  | Real-time count of total vs available tickets   |
-| **Manage voucher campaign**                   | `POST /api/v1/admin/vouchers`               | ✅ Admin/Op  | Create new voucher campaign                     |
+| **List all voucher campaigns**                | `GET /api/v1/admin/vouchers`                | ✅ Admin/Op  | READ all discount voucher campaigns             |
+| **Create new voucher campaign**               | `POST /api/v1/admin/vouchers`               | ✅ Admin/Op  | INSERT new voucher campaign                     |
+| **Update voucher campaign**                   | `PUT /api/v1/admin/vouchers/:voucherId`     | ✅ Admin/Op  | UPDATE voucher discount, dates, usage limits    |
+| **Delete / Cancel voucher campaign**          | `DELETE /api/v1/admin/vouchers/:voucherId`  | ✅ Admin/Op  | DELETE/Cancel voucher campaign                  |
 | **Handle failed/sus booking & Update status** | `PATCH /api/v1/admin/bookings/:id/status`   | ✅ Admin/Op  | Manual override status (Auto-refunds tickets)   |
