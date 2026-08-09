@@ -36,6 +36,61 @@ export class BookingController {
       return sendError(res, (error as Error).message, 500);
     }
   }
+
+  async payBooking(req: AuthenticatedRequest, res: Response) {
+    try {
+      const userid = req.user!.userid;
+      const bookingid = req.params.bookingId as string;
+      const { paymentmethod, transactionid } = req.body;
+
+      if (!paymentmethod || !transactionid) {
+        return sendError(
+          res,
+          "paymentmethod and transactionid are required",
+          400,
+        );
+      }
+
+      const result = await bookingService.payBooking({
+        bookingid,
+        userid,
+        paymentmethod,
+        transactionid,
+      });
+
+      return sendSuccess(res, result, "Payment completed successfully!", 200);
+    } catch (error) {
+      return sendError(res, (error as Error).message, 400);
+    }
+  }
+
+  async getMyBookings(req: AuthenticatedRequest, res: Response) {
+    try {
+      const userid = req.user!.userid;
+      const bookings = await bookingService.getMyBookings(userid);
+      return sendSuccess(res, bookings, "User bookings retrieved successfully", 200);
+    } catch (error) {
+      return sendError(res, (error as Error).message, 500);
+    }
+  }
+
+  async getBookingById(req: AuthenticatedRequest, res: Response) {
+    try {
+      const userid = req.user!.userid;
+      const role = req.user!.role;
+      const bookingid = req.params.bookingId as string;
+      const booking = await bookingService.getBookingById(bookingid, userid, role);
+
+      return sendSuccess(res, booking, "Booking details retrieved successfully", 200);
+    } catch (error) {
+      const statusCode = (error as Error).message.includes("Forbidden")
+        ? 403
+        : (error as Error).message.includes("not found")
+        ? 404
+        : 500;
+      return sendError(res, (error as Error).message, statusCode);
+    }
+  }
 }
 
 export const bookingController = new BookingController();

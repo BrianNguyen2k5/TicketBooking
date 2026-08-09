@@ -53,6 +53,55 @@ export class BookingService {
 
     return booking;
   }
+
+  async payBooking(params: {
+    bookingid: string;
+    userid: string;
+    paymentmethod: string;
+    transactionid: string;
+  }) {
+    const booking = await bookingRepository.findBoookingById(params.bookingid);
+
+    if (!booking) {
+      throw new Error("Booking not found");
+    }
+
+    if (booking.userid !== params.userid) {
+      throw new Error("You are not authorized to pay for this booking");
+    }
+
+    if (booking.status !== "PendingPayment") {
+      throw new Error("Booking is no longer in PendingPayment status");
+    }
+
+    if (new Date() > new Date(booking.expiredat)) {
+      throw new Error("Booking has expired. Please reserve tickets again.");
+    }
+
+    return await bookingRepository.confirmPayment(
+      params.bookingid,
+      params.paymentmethod,
+      params.transactionid,
+    );
+  }
+
+  async getMyBookings(userid: string) {
+    return await bookingRepository.findUserBookings(userid);
+  }
+
+  async getBookingById(bookingid: string, userid: string, role: string) {
+    const booking = await bookingRepository.findBoookingById(bookingid);
+
+    if (!booking) {
+      throw new Error("Booking not found");
+    }
+
+    if (booking.userid !== userid && role === "Customer") {
+      throw new Error("Forbidden: Access denied");
+    }
+
+    return booking;
+  }
 }
 
 export const bookingService = new BookingService();

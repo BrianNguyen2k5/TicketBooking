@@ -9,6 +9,7 @@ import "./config/redis";
 import authRoutes from "./routes/auth.route";
 import browseRoutes from "./routes/browse.route";
 import bookingRoutes from "./routes/booking.route";
+import adminRoutes from "./routes/admin.route";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,7 +18,7 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-// Demo kiểm tra, đảm bảo code connect tốt.
+// Health Check Endpoint
 app.get("/health", async (req, res) => {
   try {
     const userCount = await prisma.users.count();
@@ -36,31 +37,17 @@ app.get("/health", async (req, res) => {
   }
 });
 
+// 1. Auth Flow
 app.use("/api/v1/auth", authRoutes);
-// Customer
-// Browse concert (free)
-// View tickets category and prices (free, get the ticket list of a concert)
+
+// 2. Customer Browse Flow
 app.use("/api/v1/browse", browseRoutes);
 
-// Reserve tickets (authorize)
-app.use("/api/v1/booking/reserved", bookingRoutes);
+// 3. Customer Booking & Voucher & Payment Flow
+app.use("/api/v1/bookings", bookingRoutes);
 
-// Apply voucher (authorize)
-
-// Track booking status (authorize)
-
-// Admin (full authorize):
-// Monitor bookings
-
-// Manage/Publish new concert tickets (SELECT/INSERT/UPDATE/DELETE)
-
-// Validate ticket availability
-
-// Manage voucher campaign
-
-// Handle failed/sus booking
-
-// Update booking status manually
+// 4. Admin / Operation Dashboard Flow (Protected with Operator/Admin Authorization)
+app.use("/api/v1/admin", adminRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

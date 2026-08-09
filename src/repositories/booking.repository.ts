@@ -37,9 +37,38 @@ export class BookingRepository {
     return await prisma.bookings.findUnique({
       where: { bookingid: bookingId },
       include: {
-        Tickets: false,
-        Concerts: false,
-        Voucher: false,
+        Tickets: true,
+        Concerts: true,
+        Voucher: true,
+      },
+    });
+  }
+
+  async confirmPayment(bookingid: string, paymentmethod: string, transactionid: string) {
+    return await prisma.bookings.update({
+      where: { bookingid },
+      data: {
+        status: BookingStatus.Confirmed,
+        paymentmethod,
+        transactionid,
+        paidat: new Date(),
+      },
+      include: {
+        Tickets: true,
+        Concerts: true,
+        Voucher: true,
+      },
+    });
+  }
+
+  async findUserBookings(userid: string) {
+    return await prisma.bookings.findMany({
+      where: { userid },
+      orderBy: { createdat: "desc" },
+      include: {
+        Tickets: true,
+        Concerts: true,
+        Voucher: true,
       },
     });
   }
