@@ -1,4 +1,4 @@
-# 🎫 Event Ticket Booking Platform - Backend REST APIs (GEEK UP Assignment)
+# 🎫 Event Ticket Booking Platform - Backend REST APIs
 
 Hệ thống Backend RESTful API xử lý Đặt Vé Ca Nhạc (Flash Sale) chịu tải cao, giải quyết bài toán **Chống Overselling (Bán vượt vé)**, **Idempotency (Chống trùng đơn khi click đúp)**, **Phân quyền người dùng (JWT Role-based)** và **Quản trị Dashboard**.
 
