@@ -117,7 +117,27 @@ npm start
 
 ---
 
-### 4. Kiểm Tra & Thực Thi Kiểm Thử (Verification & Testing)
+### 4. 📖 Hướng Dẫn Truy Cập & Sử Dụng Swagger API Docs
+
+Dự án tích hợp sẵn tài liệu giao diện tương tác **Swagger UI (OpenAPI 3.0)** giúp trải nghiệm và test API trực tiếp trên trình duyệt mà không cần cài đặt Postman.
+
+#### 📌 **Bước 1: Truy cập Swagger UI**
+Sau khi khởi chạy server (`npm run dev`), mở trình duyệt web bất kỳ và truy cập đường dẫn:
+👉 **`http://localhost:3000/api-docs`**
+
+#### 📌 **Bước 2: Xác thực JWT Token trên Swagger UI**
+Để thực thi các API yêu cầu đăng nhập (Customer hoặc Admin):
+1. Cuộn đến tab **`Auth Flow`** ➔ Chọn API `POST /api/v1/auth/login`.
+2. Bấm nút **Try it out** ➔ Nhập email test (`nguyenvana@gmail.com` cho Customer hoặc `admin@geekup.vn` cho Admin) kèm mật khẩu `password123` ➔ Bấm **Execute**.
+3. Copy chuỗi `token` nhận được từ phản hồi JSON.
+4. Cuộn lên đầu trang Swagger ➔ Click vào nút **Authorize 🔓** (nút màu xanh lá góc trên bên phải).
+5. Nhập chuỗi: `Bearer <TOKEN_CỦA_BẠN>` (ví dụ: `Bearer eyJhbGciOi...`) ➔ Bấm **Authorize** ➔ Bấm **Close**.
+
+Bây giờ bạn có thể thử nghiệm bấm **Try it out** và **Execute** trực tiếp tất cả các APIs Đặt vé, Áp mã Voucher và Dashboard Admin!
+
+---
+
+### 5. Kiểm Tra & Thực Thi Kiểm Thử (Verification & Testing)
 
 1. **Kiểm Tra Trạng Thái Hệ Thống (Health Check API)**:
    - Mở trình duyệt hoặc Postman truy cập: `GET http://localhost:3000/health`
