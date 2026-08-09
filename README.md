@@ -68,23 +68,25 @@ cp .env.example .env
 Mở file `.env` vừa tạo và dán các thông số Redis Cloud vừa lấy vào:
 
 ```env
-# 1. Cấu hình Cổng Server
+# --- Server Environment Configuration ---
 PORT=3000
 NODE_ENV=development
 
-# 2. Cấu hình Kết Nối PostgreSQL
-DATABASE_URL="postgresql://<POSTGRES_USER>:<POSTGRES_PASSWORD>@<POSTGRES_HOST>:<POSTGRES_PORT>/<DATABASE_NAME>?schema=public"
-(Ví dụ: "postgresql://postgres:admin@localhost:5432/GeekTicketBooking?schema=public")
+# --- PostgreSQL Connection String ---
+# Replace with your PostgreSQL connection string
+# Format: postgresql://<USERNAME>:<PASSWORD>@<HOST>:<PORT>/<DATABASE_NAME>?schema=public
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ticketbooking?schema=public"
 
-# 3. Cấu hình Kết Nối Redis Cloud (Dùng REDIS_URL hoặc điền tham số riêng lẻ)
-REDIS_HOST="redis-12345.c1.us-east-1-2.ec2.cloud.redislabs.com"
-REDIS_PORT=12345
-REDIS_PASSWORD="your_redis_cloud_password"
+# --- Redis Cloud Configuration (Free 30MB Tier at app.redislabs.com) ---
+# Option A: Full Connection URL
+REDIS_URL="redis://default:<REDIS_PASSWORD>@<REDIS_HOST>:<REDIS_PORT>"
 
-# Hoặc dạng URL đầy đủ:
-# REDIS_URL="redis://default:your_redis_cloud_password@redis-12345.c1.us-east-1-2.ec2.cloud.redislabs.com:12345"
+# Option B: Individual Credentials from Redis Cloud Console
+# REDIS_HOST="redis-12345.c1.us-east-1-2.ec2.cloud.redislabs.com"
+# REDIS_PORT=12345
+# REDIS_PASSWORD="your_redis_cloud_password"
 
-# 4. Cấu hình Chuỗi Bí Mật Mã Hóa JWT Token
+# --- JWT Authentication Configuration ---
 JWT_SECRET="geekup_super_secret_jwt_key_2026"
 JWT_EXPIRES_IN="1d"
 ```
