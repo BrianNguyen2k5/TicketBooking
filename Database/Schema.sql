@@ -1,3 +1,7 @@
+-- 0. Xóa các bảng và kiểu dữ liệu Enum cũ (nếu tồn tại)
+DROP TABLE IF EXISTS "VoucherUsages", "Bookings", "Voucher", "Tickets", "Concerts", "Users" CASCADE;
+DROP TYPE IF EXISTS "UserRole", "ConcertStatus", "TicketStatus", "DiscountType", "VoucherStatus", "BookingStatus" CASCADE;
+
 -- 1. Tạo các kiểu dữ liệu Enum
 CREATE TYPE "UserRole" AS ENUM ('Customer', 'Operator', 'Admin');
 CREATE TYPE "ConcertStatus" AS ENUM ('CommingSoon', 'PreSale', 'OnSale', 'SoldOut', 'Cancelled', 'Ended');
