@@ -1,0 +1,527 @@
+{
+  "info": {
+    "_postman_id": "aac6cd52-dd8e-4cc5-bba7-c7e7ab753e56",
+    "name": "GEEKTicketBooking",
+    "description": "# 🚀 Get started here\n\nThis template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Scripts\" tab**\n\nAdding tests to your requests can help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/fa30ea0a-373d-4545-a668-e7b283cca343/aW1hZ2UucG5n\" alt=\"\" height=\"1530\" width=\"2162\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "49114242",
+    "_collection_link": "https://go.postman.co/collection/49114242-aac6cd52-dd8e-4cc5-bba7-c7e7ab753e56?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Customer",
+      "item": [
+        {
+          "name": "Login to get token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"hoanganhe@gmail.com\",\r\n  \"password\": \"password123\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reserve ticket",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJ1c3ItMDA4IiwiZW1haWwiOiJob2FuZ2FuaGVAZ21haWwuY29tIiwicm9sZSI6IkN1c3RvbWVyIiwiaWF0IjoxNzg2MjQ5MjY2LCJleHAiOjE3ODYzMzU2NjZ9.51kwMavMMAjHw7o5a1gAyeLUU_5jcP7rVi-rczPkiZY",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "order-uuid-001",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"ticketid\": \"tkt-001\",\r\n    \"amount\": 2\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/bookings",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "v1",
+                "bookings"
+              ]
+            },
+            "description": "Đăng ký mua vé giữ chỗ 1 loại ticket của 1 concert (Ở đây sẽ dùng ticket mã số 1 thuộc concert 1)\n\nTừng bước thực hiện api này:\n\n- B1: Vào **Login to get token** để thực hiện đăng nhập và lấy token\n    \n- B2: Vào tab Authorization chọn \"Bearer token\" và paste đoạn mã token vào\n    \n- B3: Qua Header tab, gõ Key = Idempotency-key và Value = <1 đoạn mã mình muốn>\n    \n- B4: Qua Body tab, gõ  \n    {\"ticketid\": \"tkt-001\", \"amount\": 2}"
+          },
+          "response": []
+        },
+        {
+          "name": "Browse concert",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/browse",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "v1",
+                "browse"
+              ]
+            },
+            "description": "Xem danh sách các concert"
+          },
+          "response": []
+        },
+        {
+          "name": "View ticket categories and prices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/browse/conc-001",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "v1",
+                "browse",
+                "conc-001"
+              ]
+            },
+            "description": "Xem thông tin danh sách các ticket mà concert mã số 1 \"conc-001\" có, kèm với giá của từng ticket"
+          },
+          "response": []
+        },
+        {
+          "name": "Apply voucher",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJ1c3ItMDA4IiwiZW1haWwiOiJob2FuZ2FuaGVAZ21haWwuY29tIiwicm9sZSI6IkN1c3RvbWVyIiwiaWF0IjoxNzg2MjQ5MjY2LCJleHAiOjE3ODYzMzU2NjZ9.51kwMavMMAjHw7o5a1gAyeLUU_5jcP7rVi-rczPkiZY",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"voucherid\": \"vch-001\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/bookings/bk-001/apply-voucher",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "v1",
+                "bookings",
+                "bk-001",
+                "apply-voucher"
+              ]
+            },
+            "description": "Áp dụng voucher giảm giá vào vé booking mã số 1\n\nDựa vào kết quả trả về ta sẽ thấy:\n\n- totalprice là giá ban đầu chưa có voucher là 7 triệu.\n    \n- Sau khi dùng voucher mã số 1 là giảm 200k.\n    \n- \\=> Cột finalprice sẽ là: 6tr800"
+          },
+          "response": []
+        },
+        {
+          "name": "Track Booking Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJ1c3ItMDA4IiwiZW1haWwiOiJob2FuZ2FuaGVAZ21haWwuY29tIiwicm9sZSI6IkN1c3RvbWVyIiwiaWF0IjoxNzg2MjQ5MjY2LCJleHAiOjE3ODYzMzU2NjZ9.51kwMavMMAjHw7o5a1gAyeLUU_5jcP7rVi-rczPkiZY",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/bookings/bk-001",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "v1",
+                "bookings",
+                "bk-001"
+              ]
+            },
+            "description": "Kiểm tra trạng thái của booking mã số 1, logic đơn giãn hóa sẽ là lấy thông tin của 1 booking cụ thể và trả về thuộc tính status của booking đó ra Frontend"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Operator/Admin",
+      "item": [
+        {
+          "name": "Admin login to get token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"admin@geekup.vn\",\r\n    \"password\": \"password123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Monitor bookings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJ1c3ItMDAxIiwiZW1haWwiOiJhZG1pbkBnZWVrdXAudm4iLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE3ODYyNTEwMDksImV4cCI6MTc4NjMzNzQwOX0.1hap8YNiJ9fQveD6cKVZF2QCNt_iPGixUrJ8IeFKsng",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/admin/bookings",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "bookings"
+              ]
+            },
+            "description": "Lấy danh sách tất cả các bookings cho admin\n\n**Các tùy chọn lọc linh hoạt khác có thể dùng:**\n\n1. **Lấy tất cả đơn**: `GET /api/v1/admin/bookings`\n    \n2. **Lọc theo trạng thái**: `GET /api/v1/admin/bookings?status=PendingPayment`\n    \n3. **Lọc theo 1 Concert cụ thể**: `GET /api/v1/admin/bookings?concertid=conc-001`\n    \n4. **Lọc theo 1 User cụ thể**: `GET /api/v1/admin/bookings?userid=usr-004`\n    \n5. **Kết hợp nhiều bộ lọc**: `GET /api/v1/admin/bookings?status=Confirmed&concertid=conc-001`"
+          },
+          "response": []
+        },
+        {
+          "name": "Manage new concert's ticket (Create Concert & Tickets)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJ1c3ItMDAxIiwiZW1haWwiOiJhZG1pbkBnZWVrdXAudm4iLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE3ODYyNTEwMDksImV4cCI6MTc4NjMzNzQwOX0.1hap8YNiJ9fQveD6cKVZF2QCNt_iPGixUrJ8IeFKsng",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "  {\r\n    \"concertname\": \"Born Pink World Tour Hanoi 2026\",\r\n    \"description\": \"Đêm nhạc đỉnh cao thế giới tại SVĐ Mỹ Đình\",\r\n    \"starttime\": \"2026-12-01T19:00:00Z\",\r\n    \"startdate\": \"2026-12-01T00:00:00Z\",\r\n    \"tickets\": [\r\n      {\r\n        \"ticketname\": \"VIP Standing\",\r\n        \"priceperticket\": 6500000,\r\n        \"totalquantity\": 1000\r\n      },\r\n      {\r\n        \"ticketname\": \"CAT 1 Seating\",\r\n        \"priceperticket\": 3500000,\r\n        \"totalquantity\": 3000\r\n      }\r\n    ]\r\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/admin/concerts",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "concerts"
+              ]
+            },
+            "description": "Đây là bản demo một trong các chức năng quản lý ticket của các concert\n\nGiả sử ở đây, ta tạo ra các thông tin cho 1 concert mới kèm theo tickets của concert đó\n\n**Ngoài ra ta cũng có 1 số API khác liên quan đến quản lý concert và ticket như:**\n\n- `PUT /admin/concerts/{concertId}`: Cập nhật thông tin Concert.\n    \n- `DELETE /admin/concerts/{concertId}`: Hủy / Vô hiệu hóa Concert.\n    \n- `POST /admin/concerts/{concertId}/tickets`: Thêm Hạng vé mới vào Concert có sẵn.\n    \n- `PATCH /admin/tickets/{ticketId}`: Cập nhật Hạng vé.\n    \n- `DELETE /admin/tickets/{ticketId}`: Hủy / Vô hiệu hóa Hạng vé."
+          },
+          "response": []
+        },
+        {
+          "name": "Handle suspicious or failed bookings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJ1c3ItMDAxIiwiZW1haWwiOiJhZG1pbkBnZWVrdXAudm4iLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE3ODYyNTEwMDksImV4cCI6MTc4NjMzNzQwOX0.1hap8YNiJ9fQveD6cKVZF2QCNt_iPGixUrJ8IeFKsng",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"Cancelled\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/admin/bookings/bkg-003/status",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "bookings",
+                "bkg-003",
+                "status"
+              ]
+            },
+            "description": "Xử lý đơn bị lỗi hoặc nghi ngờ gian lận (Handle Failed / Suspicious Bookings & Auto Refund Tickets) bằng cách chuyển trạng thái của booking đó qua Hủy (Cancel)\n\nỞ đây, ta lấy ví dụ là booking mã số 3 (bkg-003). Sau khi chuyển ta có thể thấy bookings mã số 3 đã có trạng thái (status) là Cancelled"
+          },
+          "response": []
+        },
+        {
+          "name": "Validate Ticket Availability",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJ1c3ItMDAxIiwiZW1haWwiOiJhZG1pbkBnZWVrdXAudm4iLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE3ODYyNTEwMDksImV4cCI6MTc4NjMzNzQwOX0.1hap8YNiJ9fQveD6cKVZF2QCNt_iPGixUrJ8IeFKsng",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/admin/tickets/availability?ticketid=tkt-001",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "tickets",
+                "availability"
+              ],
+              "query": [
+                {
+                  "key": "ticketid",
+                  "value": "tkt-001"
+                }
+              ]
+            },
+            "description": "Xem thông tin availability của 1 ticket. Ví dụ lấy ticket mã số 1 (tkt-001)\n\nKết quả trả về sẽ có 1 trường là \"isAvailable\" cho biết khả năng availability\n\n**Hoặc có thể dùng**\n\n`GET http://localhost:3000/api/v1/admin/tickets/availability`\n\nđể Xem tổng quan kho vé tất cả Concerts và tính khả dụng của tất cả các vé"
+          },
+          "response": []
+        },
+        {
+          "name": "Update booking status manually",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJ1c3ItMDAxIiwiZW1haWwiOiJhZG1pbkBnZWVrdXAudm4iLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE3ODYyNTEwMDksImV4cCI6MTc4NjMzNzQwOX0.1hap8YNiJ9fQveD6cKVZF2QCNt_iPGixUrJ8IeFKsng",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"Confirmed\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/admin/bookings/bkg-003/status",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "bookings",
+                "bkg-003",
+                "status"
+              ]
+            },
+            "description": "Đây là bản Demo mở rộng hơn của chức năng cho việc \"Handle suspicious or failed booking\". Ta có thể chuyển booking qua 1 số các trạng thái khác mà ta mong muốn. Bao gồm các trạng thái sau:\n\n- Pendingpayment: đang chờ thanh toán\n    \n- Confirmed: Xác nhận đã thanh toán thành công (Booking hoàn tất)\n    \n- Cancelled: Hủy booking đó\n    \n- Expired: Booking hết hạn do không thanh toán kịp hoặc đã quá thời gian xảy ra concert\n    \n\nGiả sử ở đây là chuyển bkg-003 qua \"Confirmed\". Khi nhìn vào kết quả ta sẽ thấy nội dung status đã được cập nhật thành công (\"status\": \"Confirmed\")"
+          },
+          "response": []
+        },
+        {
+          "name": "Manage voucher campaign",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJ1c3ItMDAxIiwiZW1haWwiOiJhZG1pbkBnZWVrdXAudm4iLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE3ODYyNTEwMDksImV4cCI6MTc4NjMzNzQwOX0.1hap8YNiJ9fQveD6cKVZF2QCNt_iPGixUrJ8IeFKsng",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"vouchername\": \"SUPERDEAL2026\",\r\n    \"description\": \"Giảm ngay 20% cho đơn hàng\",\r\n    \"discounttype\": \"Percentage\",\r\n    \"discountvalue\": 20,\r\n    \"maxusage\": 500,\r\n    \"maxusageperuser\": 1,\r\n    \"startdate\": \"2026-08-01T00:00:00Z\",\r\n    \"enddate\": \"2026-12-31T23:59:59Z\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/admin/vouchers",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "vouchers"
+              ]
+            },
+            "description": "Ở đây chúng ta sẽ demo tạo Voucher mới (CREATE)\n\nNgoài còn 1 số chức năng khác nằm trong CRUD để quản lý voucher. Ví dụ có thể dùng, như:  \n**Cập nhật thông tin Voucher (UPDATE Voucher)**\n\n- **Method & URL**: `PUT http://localhost:3000/api/v1/admin/vouchers/vch-001`\n    \n- **Headers**: `Authorization: Bearer`\n    \n- **Body**: { \"discountvalue\": 300000, \"maxusage\": 1000}\n    \n\n**Hủy chiến dịch Voucher (DELETE Voucher)**\n\n- **Method & URL**: `DELETE http://localhost:3000/api/v1/admin/vouchers/vch-001`\n    \n- **Headers**: `Authorization: Bearer`\n    \n\n**Xem danh sách các chiến dịch Voucher (READ)**\n\n- **Method & URL**: `GET http://localhost:3000/api/v1/admin/vouchers`"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "id",
+      "value": "1"
+    },
+    {
+      "key": "base_url",
+      "value": "https://template.postman-echo.com"
+    }
+  ]
+}
