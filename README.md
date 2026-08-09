@@ -53,9 +53,9 @@ npm install
 
 1. Đăng ký / Đăng nhập tài khoản miễn phí tại: **[https://app.redislabs.com](https://app.redislabs.com)**.
 2. Tạo một Database mới (Chọn gói **Free 30MB Fixed**).
-3. Sau khi Database được khởi tạo thành công, tại màn hình **Configuration**:
-   - Sao chép **Public endpoint (Host)** và **Port** (Ví dụ: `redis-12345.c1.us-east-1-2.ec2.cloud.redislabs.com:12345`).
-   - Kéo xuống mục **Security** ➔ Click nút xem / sao chép **Default user password**.
+3. Sau khi Database được khởi tạo thành công, tại màn hình, chọn nút **Connect** màu xanh dương:
+   - Mở tab "Redis CLI"
+   - Sao chép **Đường link** (Ví dụ: `redis://default:ABCD123456@toys-measure-standard-70550.db.redis.io:11500`) để tí đưa vào trong .env mục REDIS_URL.
 
 ##### 📌 **Khởi tạo file `.env`**:
 
@@ -74,6 +74,7 @@ NODE_ENV=development
 
 # 2. Cấu hình Kết Nối PostgreSQL
 DATABASE_URL="postgresql://<POSTGRES_USER>:<POSTGRES_PASSWORD>@<POSTGRES_HOST>:<POSTGRES_PORT>/<DATABASE_NAME>?schema=public"
+(Ví dụ: "postgresql://postgres:admin@localhost:5432/GeekTicketBooking?schema=public")
 
 # 3. Cấu hình Kết Nối Redis Cloud (Dùng REDIS_URL hoặc điền tham số riêng lẻ)
 REDIS_HOST="redis-12345.c1.us-east-1-2.ec2.cloud.redislabs.com"
