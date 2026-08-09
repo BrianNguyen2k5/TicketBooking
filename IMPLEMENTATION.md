@@ -55,7 +55,7 @@ src/
   - `Voucher` (`voucherid`, `vouchername`, `description`, `discounttype`: `Fixed`, `Percentage`, `discountvalue`, `maxusage`, `maxusageperuser`, `startdate`, `enddate`, `usedcount`, `status`: `Unavailable`, `Available`, `Ended`, `Cancelled`).
   - `Bookings` (`bookingid`, `userid`, `ticketid`, `concertid`, `voucherid`, `createdat`, `expiredat`, `amount`, `totalprice`, `discountprice`, `finalprice`, `paymentmethod`, `transactionid`, `paidat`, `idempotencykey`, `status`: `PendingPayment`, `Confirmed`, `Cancelled`, `Expired`).
   - `VoucherUsages` (`userid`, `voucherid`, `appliedat`).
-- [ ] **1.2. Phân Tích Giải Pháp Kỹ Thuật Trọng Tâm (Technical Trade-offs)**:
+- [x] **1.2. Phân Tích Giải Pháp Kỹ Thuật Trọng Tâm (Technical Trade-offs)**:
   - **Chống Oversell**: Kết hợp DB Transaction với *Atomic SQL UPDATE* (`UPDATE "Tickets" SET availablequantity = availablequantity - $amount WHERE ticketid = $id AND availablequantity >= $amount`) hoặc *Redis Lock / Counter*.
   - **Chống Duplicate Request (Idempotency)**: Middleware đọc `idempotencykey` lưu trên Redis Cloud với TTL (vd: 24h).
   - **Chống Lạm Dụng Voucher**: Quản lý `usedcount` atomic + ghi nhận `VoucherUsages` (`userid`, `voucherid`, `appliedat`) kiểm tra giới hạn `maxusageperuser`.
@@ -78,37 +78,40 @@ src/
 ---
 
 ### Giai Đoạn 3: Phát Triển Core APIs (Mô Hình 3 Lớp) - Customer Flow
-- [ ] **3.1. Auth & Common Utilities**:
-  - Zod DTO Validation Middleware.
+- [x] **3.1. Auth & Common Utilities**:
   - JWT Auth Middleware (`authenticate`, `authorizeRole`).
-- [ ] **3.2. Concert & Ticket Browsing**:
-  - `ConcertController` -> `ConcertService` -> `ConcertRepository`
-  - `GET /api/v1/concerts`: Danh sách sự kiện & các hạng vé khả dụng.
-  - `GET /api/v1/concerts/:id`: Chi tiết sự kiện & số lượng vé `availablequantity`.
-- [ ] **3.3. Ticket Reservation (Tải cao & Concurrency trọng tâm)**:
+  - Standard Response Helper (`sendSuccess`, `sendError`).
+  - Dynamic ID Generator (`generateNextId`).
+- [x] **3.2. Concert & Ticket Browsing**:
+  - `ConcertController` -> `BrowseService` -> `ConcertRepository`
+  - `GET /api/v1/browse`: Danh sách sự kiện & các hạng vé khả dụng.
+  - `GET /api/v1/browse/:concertId`: Chi tiết sự kiện & danh sách vé `Tickets`.
+- [x] **3.3. Ticket Reservation (Tải cao & Concurrency trọng tâm)**:
   - `BookingController` -> `BookingService` -> `BookingRepository` & `TicketRepository`
-  - `POST /api/v1/bookings/reserve`:
-    - Middleware kiểm tra `idempotencykey`.
-    - `BookingService` gọi `TicketRepository` thực hiện Atomic Update giữ vé (`PendingPayment`) trong 10-15 phút.
-- [ ] **3.4. Voucher Application**:
+  - `POST /api/v1/bookings`:
+    - Middleware `checkIdempotency` lưu Cache vào Redis Cloud.
+    - `BookingService` gọi `TicketRepository` thực hiện Atomic Update giữ vé (`PendingPayment`) trong 10 phút.
+- [x] **3.4. Voucher Application**:
   - `VoucherController` -> `VoucherService` -> `VoucherRepository`
-  - `POST /api/v1/bookings/:id/apply-voucher`: Áp dụng voucher, kiểm tra `maxusage`, `maxusageperuser` và tính lại `finalprice`.
-- [ ] **3.5. Payment & Order Status**:
-  - `POST /api/v1/bookings/:id/pay`: Mock callback thanh toán thành công -> chuyển trạng thái `Confirmed`, cập nhật `paidat`.
-  - `GET /api/v1/bookings/:id`: Xem chi tiết trạng thái đơn hàng.
+  - `POST /api/v1/bookings/:bookingId/apply-voucher`: Áp dụng voucher, kiểm tra `maxusage`, `maxusageperuser` và tính lại `finalprice` trong Database Transaction.
+- [x] **3.5. Payment & Order Status**:
+  - `POST /api/v1/bookings/:bookingId/pay`: Mock callback thanh toán thành công -> chuyển trạng thái `Confirmed`, cập nhật `paidat`.
+  - `GET /api/v1/bookings/my-bookings`: Xem danh sách đơn hàng đã đặt của user.
+  - `GET /api/v1/bookings/:bookingId`: Xem chi tiết trạng thái đơn hàng.
 
 ---
 
 ### Giai Đoạn 4: Phát Triển Internal Operation Dashboard APIs
-- [ ] **4.1. Monitoring & Analytics**:
-  - `AdminController` -> `AdminService` -> `BookingRepository`
-  - `GET /api/v1/admin/bookings`: Đăng danh sách booking có filter.
+- [x] **4.1. Monitoring & Analytics**:
+  - `AdminController` -> `AdminService` -> `AdminRepository`
+  - `GET /api/v1/admin/bookings`: Xem danh sách booking có filter theo status, concertid, userid.
   - `GET /api/v1/admin/dashboard/stats`: Thống kê tổng số vé bán ra, doanh thu, tỷ lệ đơn `Confirmed`.
-- [ ] **4.2. Management APIs**:
-  - `POST /api/v1/admin/concerts`: Tạo concert & các hạng vé `Tickets`.
+- [x] **4.2. Management APIs**:
+  - `POST /api/v1/admin/concerts`: Tạo concert & các hạng vé `Tickets` (dùng `generateNextId`).
+  - `GET /api/v1/admin/tickets/availability`: Kiểm tra số lượng vé tổng vs vé khả dụng thực tế.
   - `POST /api/v1/admin/vouchers`: Tạo chiến dịch voucher mới.
-- [ ] **4.3. Manual Override Workflow**:
-  - `PATCH /api/v1/admin/bookings/:id/status`: Operator can thiệp cập nhật trạng thái đơn (Hủy đơn nghi ngờ gian lận, nhả vé thủ công).
+- [x] **4.3. Manual Override Workflow**:
+  - `PATCH /api/v1/admin/bookings/:bookingId/status`: Operator can thiệp cập nhật trạng thái đơn (Hủy đơn nghi ngờ gian lận, tự động hoàn trả vé vào kho nếu Hủy đơn).
 
 ---
 
@@ -133,5 +136,5 @@ src/
 - Script test concurrency (gửi nhiều HTTP requests song song đến API Reserve Ticket để kiểm tra `availablequantity >= 0`).
 
 ### Kiểm Thử Thủ Công
-- Sử dụng Postman Collection nhập `idempotencykey` trùng lặp để kiểm tra API trả về cùng một kết quả mà không tạo đơn trùng.
+- Sử dụng Postman Collection nhập `Idempotency-Key` trùng lặp để kiểm tra API trả về cùng một kết quả mà không tạo đơn trùng.
 - Kiểm tra Swagger UI tương tác tại `http://localhost:3000/api-docs`.
