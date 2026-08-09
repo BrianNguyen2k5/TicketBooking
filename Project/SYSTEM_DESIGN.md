@@ -54,7 +54,6 @@ erDiagram
     Users ||--o{ Bookings : "creates"
     Users ||--o{ VoucherUsages : "uses"
     Concerts ||--|{ Tickets : "contains"
-    Concerts ||--o{ Bookings : "hosts"
     Tickets ||--o{ Bookings : "booked_in"
     Voucher ||--o{ Bookings : "applied_to"
     Voucher ||--o{ VoucherUsages : "tracked_in"
@@ -96,7 +95,6 @@ erDiagram
         string bookingid PK "bkg-001"
         string userid FK "usr-001"
         string ticketid FK "tkt-001"
-        string concertid FK "conc-001"
         string voucherid FK "vch-001"
         int amount
         decimal totalprice

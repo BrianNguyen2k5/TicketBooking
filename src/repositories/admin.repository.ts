@@ -18,14 +18,17 @@ export class AdminRepository {
     return await prisma.bookings.findMany({
       where: {
         ...(filters.status && { status: filters.status }),
-        ...(filters.concertid && { concertid: filters.concertid }),
+        ...(filters.concertid && { Tickets: { concertid: filters.concertid } }),
         ...(filters.userid && { userid: filters.userid }),
       },
       orderBy: { createdat: "desc" },
       include: {
         Users: true,
-        Tickets: true,
-        Concerts: true,
+        Tickets: {
+          include: {
+            Concerts: true,
+          },
+        },
         Voucher: true,
       },
     });
@@ -334,8 +337,11 @@ export class AdminRepository {
         data: { status: newStatus },
         include: {
           Users: true,
-          Tickets: true,
-          Concerts: true,
+          Tickets: {
+            include: {
+              Concerts: true,
+            },
+          },
           Voucher: true,
         },
       });

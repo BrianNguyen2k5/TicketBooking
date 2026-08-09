@@ -239,6 +239,7 @@ Khi xây dựng một API mới, kỹ sư phát triển tuân theo quy trình 6 
 
 ## 📑 Danh Sách Tài Liệu Dự Án (Project Deliverables)
 
+- 🗄️ [DATABASE_DESIGN.md](./Project/DATABASE_DESIGN.md): Phân tích Kỹ thuật Chi tiết Thiết kế CSDL, Chuẩn 3NF, Atomic SQL Locks & Chiến lược Indexing B-Tree.
 - 📜 [SYSTEM_DESIGN.md](./Project/SYSTEM_DESIGN.md): Thiết kế Kiến trúc 3 Lớp, ERD, Sequence Diagram và giải pháp chống Oversell & Idempotency.
 - 📋 [ASSUMPTIONS_AND_LIMITATIONS.md](./Project/ASSUMPTIONS_AND_LIMITATIONS.md): Nêu rõ các Giả định Kinh doanh, Phạm vi Tính năng đã làm & Giới hạn hệ thống.
 - 🧪 [TEST_PLAN.md](./Project/TEST_PLAN.md): Kịch bản kiểm thử API từng bước chi tiết trên Postman.

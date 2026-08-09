@@ -43,7 +43,6 @@ export class BookingService {
     const booking = await bookingRepository.createBooking({
       userid: data.userid,
       ticketid: data.ticketid,
-      concertid: ticket.concertid,
       amount: data.amount,
       totalprice,
       finalprice,
