@@ -342,4 +342,4 @@ API hỗ trợ 2 cách kiểm tra:
 
 ## ✅ KẾT LUẬN
 
-Tài liệu này phủ 100% tất cả các kịch bản sử dụng thực tế. Bạn có thể sử dụng file [TEST_PLAN.md](file:///d:/1_Personal/Visual-Code/2_Career/Geekup/TEST_PLAN.md) này để kiểm thử từng bước trực tiếp trên Postman một cách mượt mà và trực quan!
+Tài liệu này phủ 100% tất cả các kịch bản sử dụng thực tế. Bạn có thể sử dụng file [TEST_PLAN.md](./TEST_PLAN.md) này để kiểm thử từng bước trực tiếp trên Postman một cách mượt mà và trực quan!
